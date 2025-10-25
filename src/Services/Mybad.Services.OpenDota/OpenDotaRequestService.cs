@@ -3,7 +3,6 @@ using Mybad.Core.Models;
 using Mybad.Core.Models.Responses;
 using Mybad.Core.Services;
 using Mybad.Services.OpenDota.ApiResponseModels;
-using Mybad.Services.OpenDota.Models.Wards;
 
 namespace Mybad.Services.OpenDota;
 
@@ -15,7 +14,7 @@ public class OpenDotaRequestService : IRequestService
 	{
 		var task = request.RequestType switch
 		{
-			RequestType.Wards => GetWardsPlacementMap((WardsRequest)request),
+			RequestType.Wards => GetWardsInfoForMatch((WardsRequest)request),
 			RequestType.Picks => GetHeroesInfo(request.URL),
 			_ => GetWardsPlacementMap((WardsRequest)request)
 		};
@@ -28,17 +27,30 @@ public class OpenDotaRequestService : IRequestService
 		var limit = 5;
 		using var http = new HttpClient();
 		//var response = await http.GetFromJsonAsync<WardsInfo>(_urlPath + $"players/136996088/matches?limit={request.MatchesCount}");
-		var apiResponse = await http.GetFromJsonAsync<WardMapRequest>(_urlPath + $"players/136996088/wardmap?limit={limit}");
 
-		var reader = new ApiReponseConverters.WardsPlacementMapReader();
+		try
+		{
+			var apiResponse = await http.GetFromJsonAsync<WardMapRequest>(_urlPath + $"players/136996088/wardmap?limit={limit}");
 
-		return reader.ConvertWardsPlacementMap(apiResponse);
+			if (apiResponse == null)
+			{
+				throw new InvalidOperationException();
+			}
+
+			var reader = new ApiReponseConverters.WardsPlacementMapReader();
+
+			return reader.ConvertWardsPlacementMap(apiResponse);
+		}
+		catch (Exception)
+		{
+			throw;
+		}
 	}
 
 	private async Task<BaseResponse> GetWardsInfoForMatch(WardsRequest request)
 	{
 		using var http = new HttpClient();
-		var response = await http.GetFromJsonAsync<WardsInfo>(_urlPath + $"players/136996088/8519566987");
+		var response = await http.GetFromJsonAsync<WardsInfo>(_urlPath + $"matches/8519566987");
 
 		throw new NotImplementedException();
 	}
