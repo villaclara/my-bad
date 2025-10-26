@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\matchWards.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Data\wardmap.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

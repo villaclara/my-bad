@@ -30,7 +30,7 @@ public class OpenDotaRequestService : IRequestService
 
 		try
 		{
-			var apiResponse = await http.GetFromJsonAsync<WardMapRequest>(_urlPath + $"players/136996088/wardmap?limit={limit}");
+			var apiResponse = await http.GetFromJsonAsync<WardPlacementMap>(_urlPath + $"players/136996088/wardmap?limit={limit}");
 
 			if (apiResponse == null)
 			{
@@ -50,7 +50,7 @@ public class OpenDotaRequestService : IRequestService
 	private async Task<BaseResponse> GetWardsInfoForMatch(WardsRequest request)
 	{
 		using var http = new HttpClient();
-		var response = await http.GetFromJsonAsync<WardsInfo>(_urlPath + $"matches/8519566987");
+		var response = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/8519566987");
 
 		throw new NotImplementedException();
 	}
