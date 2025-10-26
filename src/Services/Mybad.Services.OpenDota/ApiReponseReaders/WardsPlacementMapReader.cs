@@ -52,7 +52,7 @@ public class WardsPlacementMapReader
 		foreach (var obs in playerInfo.ObsLog)
 		{
 			var timeLived = 360;    // Default duration - 6mins.
-			if (playerInfo.ObsLeftLog.FirstOrDefault(x => x.X == obs.X && x.Y == obs.Y) is WardLogEntry leftLogEntry)
+			if (playerInfo.ObsLeftLog.FirstOrDefault(x => x.EHandle == obs.EHandle) is WardLogEntry leftLogEntry)
 			{
 				/* 
 				 * Calculating time depending on whether ward was placed and destroyed before/after horn.
@@ -87,7 +87,7 @@ public class WardsPlacementMapReader
 		foreach (var sen in playerInfo.SenLog)
 		{
 			var timeLived = 420;    // Default duration - 7 mins
-			if (playerInfo.SenLeftLog.FirstOrDefault(x => x.X == sen.X && x.Y == sen.Y) is WardLogEntry leftLogEntry)
+			if (playerInfo.SenLeftLog.FirstOrDefault(x => x.EHandle == sen.EHandle) is WardLogEntry leftLogEntry)
 			{
 				/* 
 				 * Calculating time depending on whether ward was placed and destroyed before/after horn.

@@ -211,10 +211,10 @@ public record class WardLogEntry
 	public bool EntityLeft { get; set; }
 
 	/// <summary>
-	/// Unknown behavior.
+	/// Gets or sets ehandle. It seems that it is identifier for ward entry. The same value is used in <see cref="WardLeftLogEntry"/>.
 	/// </summary>
 	[JsonPropertyName("ehandle")]
-	public long EHandle { get; set; }
+	public virtual long EHandle { get; set; }
 
 	/// <summary>
 	/// Gets or sets 2d point were ward was placed as '<c>[x,y]</c>' coordinates object. 
@@ -289,8 +289,14 @@ public record class WardLeftLogEntry : WardLogEntry
 	/// Gets or sets Y point on map where ward was destroyed.
 	/// </summary>
 	/// <remarks>
-	/// This or <see cref="WardLogEntry.Key"/> should be used to find the matches between wards to check if the ward was destroyed.
+	/// This or <see cref="WardLogEntry.EHandle"/> should be used to find the matches between wards to check if the ward was destroyed.
 	/// </remarks>
 	[JsonPropertyName("y")]
 	public override double Y { get; set; }
+
+	/// <summary>
+	/// Gets or sets ehandle. It seems that it is identifier for ward entry. The same value is used in <see cref="WardLogEntry"/>.
+	/// </summary>
+	[JsonPropertyName("ehandle")]
+	public override long EHandle { get; set; }
 }
