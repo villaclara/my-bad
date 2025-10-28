@@ -2,7 +2,9 @@
 using System.Runtime.CompilerServices;
 using Mybad.Core;
 using Mybad.Core.Requests;
+using Mybad.Core.Responses;
 using Mybad.Services.OpenDota.ApiResponseModels;
+using Mybad.Services.OpenDota.ApiResponseModels.Player;
 using Mybad.Services.OpenDota.ApiResponseReaders;
 
 [assembly: InternalsVisibleTo("OpenDotaService.Tests")]
@@ -88,7 +90,44 @@ public class OpendotaProvider : IInfoProvider
 	 */
 	private async Task<BaseResponse> GetWardsLogInfo(WardLogRequest request)
 	{
-		throw new NotImplementedException();
+		ArgumentNullException.ThrowIfNull(request.AccountId);
+
+		using var http = new HttpClient();
+		var response = await http.GetFromJsonAsync<RecentMatches>(_urlPath + $"players/136996088/recentMatches");
+
+		if (response == null)
+		{
+			throw new InvalidOperationException();
+		}
+
+		// TODO - Check for database entries of matches
+
+		var tasks = new List<Task>();
+		foreach (var match in response.Matches)
+		{
+			if (match.Lane != null)
+			{
+				var task = Task.Run(async () =>
+				{
+					var r = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/{match.MatchId}");
+				}).ContinueWith(t =>
+				{
+					if (response == null)
+					{
+						throw new InvalidOperationException();
+					}
+
+					var reader = new WardsPlacementMapReader();
+
+					//return reader.ConvertWardsLogMatch(response, (long)request.AccountId!);
+				});
+
+				tasks.Add(task);
+			}
+		}
+
+		return new WardsLogMatchResponse();
+
 	}
 
 	private async Task<BaseResponse> GetHeroesInfo(string url)

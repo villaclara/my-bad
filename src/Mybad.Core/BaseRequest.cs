@@ -17,5 +17,5 @@ public abstract class BaseRequest
 	/// <summary>
 	/// Gets or sets account id of the player for which you want to perform the request.
 	/// </summary>
-	public long? AccountId { get; set; }
+	public virtual long? AccountId { get; set; }
 }

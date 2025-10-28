@@ -1,9 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Mybad.Core;
 
 namespace Mybad.Services.OpenDota.ApiResponseModels;
 
-internal class MatchWardLogInfo : BaseResponse
+internal class MatchWardLogInfo
 {
 	/// <summary>
 	/// Gets or sets the unique Id of the match.
@@ -27,10 +26,10 @@ internal class MatchWardLogInfo : BaseResponse
 	/// Gets or sets list of <see cref="Player"/> objects which is players in the match.
 	/// </summary>
 	[JsonPropertyName("players")]
-	public List<Player> Players { get; set; } = [];
+	public List<MatchPlayer> Players { get; set; } = [];
 }
 
-internal class Player
+internal class MatchPlayer
 {
 	/// <summary>
 	/// Gets or sets account id of player.

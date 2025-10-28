@@ -29,7 +29,7 @@ IInfoProvider service = new OpendotaProvider();
 //	Console.WriteLine(kvp.X + " " + kvp.Y + " " + kvp.Amount);
 //}
 
-BaseRequest req = new WardLogSingleMatchRequest(136996088, 8519566987);
+BaseRequest req = new WardLogRequest(136996088);
 
 var a = await service.GetData(req);
 var b = (WardsLogMatchResponse)a;
