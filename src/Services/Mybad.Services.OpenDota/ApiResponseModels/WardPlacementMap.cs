@@ -2,7 +2,7 @@
 
 namespace Mybad.Services.OpenDota.ApiResponseModels;
 
-public class WardPlacementMap
+internal class WardPlacementMap
 {
 	[JsonPropertyName("obs")]
 	public Dictionary<string, Dictionary<string, int>> Obs { get; set; } = [];

@@ -3,7 +3,7 @@ using Mybad.Core.Models.Responses;
 
 namespace Mybad.Services.OpenDota.ApiResponseModels;
 
-public class MatchWardLogInfo : BaseResponse
+internal class MatchWardLogInfo : BaseResponse
 {
 	/// <summary>
 	/// Gets or sets the unique Id of the match.
@@ -30,7 +30,7 @@ public class MatchWardLogInfo : BaseResponse
 	public List<Player> Players { get; set; } = [];
 }
 
-public class Player
+internal class Player
 {
 	/// <summary>
 	/// Gets or sets account id of player.
@@ -162,7 +162,7 @@ public class Player
 ///     }
 /// </code>
 /// </remarks>
-public record class WardLogEntry
+internal record class WardLogEntry
 {
 	/// <summary>
 	/// Gets or sets time in seconds when the ward was put.
@@ -254,7 +254,7 @@ public record class WardLogEntry
 ///	},
 /// </code>
 /// </remarks>
-public record class WardLeftLogEntry : WardLogEntry
+internal record class WardLeftLogEntry : WardLogEntry
 {
 	/// <summary>
 	/// Gets or sets hero who destroyed ward with string like '<c>npc_dota_hero_[heroname]</c>.

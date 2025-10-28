@@ -4,7 +4,7 @@ using Mybad.Core.Services;
 using Mybad.Services.OpenDota;
 
 
-IRequestService service = new OpenDotaRequestService();
+IRequestService service = new OpendotaProvider();
 
 //BaseRequest request = new WardsRequest
 //{

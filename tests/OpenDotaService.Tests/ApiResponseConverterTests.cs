@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Mybad.Core.Models.Entries;
-using Mybad.Services.OpenDota.ApiReponseConverters;
 using Mybad.Services.OpenDota.ApiResponseModels;
+using Mybad.Services.OpenDota.ApiResponseReaders;
 
 namespace OpenDotaService.Tests;
 

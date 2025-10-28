@@ -1,8 +1,8 @@
-﻿using Mybad.Core.Models.Entries;
+﻿using Mybad.Core.Responses.Entries;
 
-namespace Mybad.Core.Models.Responses;
+namespace Mybad.Core.Responses;
 
-public class WardsLogMatchResponse
+public class WardsLogMatchResponse : BaseResponse
 {
 	public List<WardLog> ObserverWardsLog { get; set; } = [];
 	public List<WardLog> SentryWardsLog { get; set; } = [];

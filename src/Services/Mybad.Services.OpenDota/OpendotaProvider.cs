@@ -1,28 +1,31 @@
 ﻿using System.Net.Http.Json;
-using Mybad.Core.Models;
-using Mybad.Core.Models.Responses;
-using Mybad.Core.Services;
+using System.Runtime.CompilerServices;
+using Mybad.Core;
+using Mybad.Core.Requests;
 using Mybad.Services.OpenDota.ApiResponseModels;
+using Mybad.Services.OpenDota.ApiResponseReaders;
+
+[assembly: InternalsVisibleTo("OpenDotaService.Tests")]
 
 namespace Mybad.Services.OpenDota;
 
-public class OpenDotaRequestService : IRequestService
+public class OpendotaProvider : IInfoProvider
 {
 	private static string _urlPath = "https://api.opendota.com/api/";
 
 	public async Task<BaseResponse> GetData(BaseRequest request)
 	{
-		var task = request.RequestType switch
+		var task = request switch
 		{
-			RequestType.Wards => GetWardsInfoForMatch((WardsRequest)request),
-			RequestType.Picks => GetHeroesInfo(request.URL),
-			_ => GetWardsPlacementMap((WardsRequest)request)
+			WardLogMatchRequest req => GetWardsInfoForMatch(req),
+			WardMapRequest req => GetWardsPlacementMap(req),
+			_ => throw new Exception()
 		};
 
 		return await task;
 	}
 
-	private async Task<BaseResponse> GetWardsPlacementMap(WardsRequest request)
+	private async Task<BaseResponse> GetWardsPlacementMap(WardMapRequest request)
 	{
 		var limit = 5;
 		using var http = new HttpClient();
@@ -37,7 +40,7 @@ public class OpenDotaRequestService : IRequestService
 				throw new InvalidOperationException();
 			}
 
-			var reader = new ApiReponseConverters.WardsPlacementMapReader();
+			var reader = new WardsPlacementMapReader();
 
 			return reader.ConvertWardsPlacementMap(apiResponse);
 		}
@@ -47,7 +50,7 @@ public class OpenDotaRequestService : IRequestService
 		}
 	}
 
-	private async Task<BaseResponse> GetWardsInfoForMatch(WardsRequest request)
+	private async Task<BaseResponse> GetWardsInfoForMatch(WardLogMatchRequest request)
 	{
 		using var http = new HttpClient();
 		var response = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/8519566987");

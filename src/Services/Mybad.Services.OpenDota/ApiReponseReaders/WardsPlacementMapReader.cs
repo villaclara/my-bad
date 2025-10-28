@@ -1,10 +1,10 @@
 ﻿using Mybad.Core.Models.Entries;
-using Mybad.Core.Models.Responses;
+using Mybad.Core.Responses;
 using Mybad.Services.OpenDota.ApiResponseModels;
 
-namespace Mybad.Services.OpenDota.ApiReponseConverters;
+namespace Mybad.Services.OpenDota.ApiResponseReaders;
 
-public class WardsPlacementMapReader
+internal class WardsPlacementMapReader
 {
 	public WardsPlacementMapResponse ConvertWardsPlacementMap(WardPlacementMap apiReponse)
 	{

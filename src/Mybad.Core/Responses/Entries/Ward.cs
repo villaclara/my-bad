@@ -1,4 +1,4 @@
-﻿namespace Mybad.Core.Models.Entries;
+﻿namespace Mybad.Core.Responses.Entries;
 
 public class Ward
 {
