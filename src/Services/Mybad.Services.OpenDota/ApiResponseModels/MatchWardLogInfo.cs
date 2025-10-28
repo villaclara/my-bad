@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Mybad.Core.Models.Responses;
+using Mybad.Core;
 
 namespace Mybad.Services.OpenDota.ApiResponseModels;
 

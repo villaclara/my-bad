@@ -17,9 +17,10 @@ public class OpendotaProvider : IInfoProvider
 	{
 		var task = request switch
 		{
-			WardLogMatchRequest req => GetWardsInfoForMatch(req),
+			WardLogSingleMatchRequest req => GetWardsInfoForMatch(req),
+			WardLogRequest req => GetWardsLogInfo(req),
 			WardMapRequest req => GetWardsPlacementMap(req),
-			_ => throw new Exception()
+			_ => throw new NotImplementedException($"{nameof(OpendotaProvider)} does not have implementations with this request type.")
 		};
 
 		return await task;
@@ -27,13 +28,12 @@ public class OpendotaProvider : IInfoProvider
 
 	private async Task<BaseResponse> GetWardsPlacementMap(WardMapRequest request)
 	{
-		var limit = 5;
 		using var http = new HttpClient();
 		//var response = await http.GetFromJsonAsync<WardsInfo>(_urlPath + $"players/136996088/matches?limit={request.MatchesCount}");
 
 		try
 		{
-			var apiResponse = await http.GetFromJsonAsync<WardPlacementMap>(_urlPath + $"players/136996088/wardmap?limit={limit}");
+			var apiResponse = await http.GetFromJsonAsync<WardPlacementMap>(_urlPath + $"players/136996088/wardmap?having=100");
 
 			if (apiResponse == null)
 			{
@@ -50,11 +50,44 @@ public class OpendotaProvider : IInfoProvider
 		}
 	}
 
-	private async Task<BaseResponse> GetWardsInfoForMatch(WardLogMatchRequest request)
+	private async Task<BaseResponse> GetWardsInfoForMatch(WardLogSingleMatchRequest request)
 	{
-		using var http = new HttpClient();
-		var response = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/8519566987");
+		var accountId = request.AccountId ?? 0;
+		try
+		{
+			using var http = new HttpClient();
+			var response = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/{request.MatchId}");
 
+			if (response == null)
+			{
+				throw new InvalidOperationException();
+			}
+
+			var reader = new WardsPlacementMapReader();
+
+			return reader.ConvertWardsLogMatch(response, accountId);
+
+		}
+		catch (Exception)
+		{
+			throw;
+		}
+
+		throw new NotImplementedException();
+	}
+
+	/*
+	 * Flow
+	 * 1. Get player Id 
+	 * 2. Get last {amount} matches ID for the player
+	 * 3. On every match check if the match is parsed
+	 * 4. If yes - then get wards info for match
+	 * 4.1. if no - ask to parse and save the state somewhere
+	 * 5. Wait for all matches to be checked 
+	 * 6. return
+	 */
+	private async Task<BaseResponse> GetWardsLogInfo(WardLogRequest request)
+	{
 		throw new NotImplementedException();
 	}
 

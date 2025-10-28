@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Mybad.Core.Models.Entries;
+using Mybad.Core.Responses.Entries;
 using Mybad.Services.OpenDota.ApiResponseModels;
 using Mybad.Services.OpenDota.ApiResponseReaders;
 

@@ -1,19 +1,19 @@
-﻿using Mybad.Core.Models.Entries;
-using Mybad.Core.Responses;
+﻿using Mybad.Core.Responses;
+using Mybad.Core.Responses.Entries;
 using Mybad.Services.OpenDota.ApiResponseModels;
 
 namespace Mybad.Services.OpenDota.ApiResponseReaders;
 
 internal class WardsPlacementMapReader
 {
-	public WardsPlacementMapResponse ConvertWardsPlacementMap(WardPlacementMap apiReponse)
+	public WardsMapPlacementResponse ConvertWardsPlacementMap(WardPlacementMap apiReponse)
 	{
-		var response = new WardsPlacementMapResponse();
+		var response = new WardsMapPlacementResponse();
 		foreach (var (x, innerDic) in apiReponse.Obs)
 		{
 			foreach (var (y, amount) in innerDic)
 			{
-				response.ObserverWards.Add(new Core.Models.Entries.Ward
+				response.ObserverWards.Add(new Ward
 				{
 					X = int.Parse(x),
 					Y = int.Parse(y),
@@ -26,7 +26,7 @@ internal class WardsPlacementMapReader
 		{
 			foreach (var (y, amount) in innerDic)
 			{
-				response.SentryWards.Add(new Core.Models.Entries.Ward
+				response.SentryWards.Add(new Ward
 				{
 					X = int.Parse(x),
 					Y = int.Parse(y),
