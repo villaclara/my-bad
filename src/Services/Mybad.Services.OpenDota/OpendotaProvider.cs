@@ -1,8 +1,9 @@
-﻿using System.Net.Http.Json;
+﻿using System.Collections.Concurrent;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Mybad.Core;
 using Mybad.Core.Requests;
-using Mybad.Core.Responses;
 using Mybad.Services.OpenDota.ApiResponseModels;
 using Mybad.Services.OpenDota.ApiResponseModels.Player;
 using Mybad.Services.OpenDota.ApiResponseReaders;
@@ -26,6 +27,13 @@ public class OpendotaProvider : IInfoProvider
 		};
 
 		return await task;
+	}
+
+	private async Task<T?> ReadData<T>(BaseRequest request)
+	{
+		using var http = new HttpClient();
+		var response = await http.GetFromJsonAsync<T>(_urlPath);
+		return response;
 	}
 
 	private async Task<BaseResponse> GetWardsPlacementMap(WardMapRequest request)
@@ -93,45 +101,82 @@ public class OpendotaProvider : IInfoProvider
 		ArgumentNullException.ThrowIfNull(request.AccountId);
 
 		using var http = new HttpClient();
-		var response = await http.GetFromJsonAsync<RecentMatches>(_urlPath + $"players/136996088/recentMatches");
+		var response = await http.GetFromJsonAsync<List<RecentMatch>>(_urlPath + $"players/136996088/recentMatches");
 
 		if (response == null)
 		{
 			throw new InvalidOperationException();
 		}
+		var reader = new WardsPlacementMapReader();
 
 		// TODO - Check for database entries of matches
 
-		var tasks = new List<Task>();
-		foreach (var match in response.Matches)
-		{
-			if (match.Lane != null)
+		var bag = new ConcurrentBag<MatchWardLogInfo>();
+
+		//Parallel.ForEach(response, async (match) =>
+		//{
+		//	if (match.Lane != null)
+		//	{
+		//		var r = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/{match.MatchId}");
+		//		if (r != null)
+		//		{
+		//			File.WriteAllText($"Data/{match.MatchId}.txt", JsonSerializer.Serialize(r));
+		//			bag.Add(r);
+		//		}
+		//	}
+		//});
+
+		Directory.CreateDirectory("Data");
+		var tasks = response.Where(m => m.Lane != null)
+			.Select(async match =>
 			{
-				var task = Task.Run(async () =>
+				var r = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/{match.MatchId}");
+
+				if (r != null)
 				{
-					var r = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/{match.MatchId}");
-				}).ContinueWith(t =>
-				{
-					if (response == null)
-					{
-						throw new InvalidOperationException();
-					}
+					var json = JsonSerializer.Serialize(r, new JsonSerializerOptions { WriteIndented = true });
+					var filePath = Path.Combine("Data", $"{match.MatchId}.txt");
+					await File.WriteAllTextAsync(filePath, json);
+					return r;
+				}
 
-					var reader = new WardsPlacementMapReader();
+				return null;
+			})
+			.ToList();
 
-					//return reader.ConvertWardsLogMatch(response, (long)request.AccountId!);
-				});
+		var result = await Task.WhenAll(tasks);
 
-				tasks.Add(task);
-			}
-		}
+		//var tasks = new List<Task>();
+		//foreach (var match in response.Matches)
+		//{
+		//	if (match.Lane != null)
+		//	{
+		//		var task = Task.Run(async () =>
+		//		{
+		//			var r = await http.GetFromJsonAsync<MatchWardLogInfo>(_urlPath + $"matches/{match.MatchId}");
+		//		}).ContinueWith(t =>
+		//		{
+		//			if (response == null)
+		//			{
+		//				throw new InvalidOperationException();
+		//			}
+		//		});
+		//		tasks.Add(task);
+		//	}
+		//}
 
-		return new WardsLogMatchResponse();
-
+		return reader.ConvertWardsLogManyMathes(result.ToList()!, (long)request.AccountId);
 	}
 
 	private async Task<BaseResponse> GetHeroesInfo(string url)
 	{
 		throw new NotImplementedException();
+	}
+
+
+	private async Task<MatchWardLogInfo> DownloadMatchLogInfo(string url)
+	{
+		throw new NotImplementedException();
+
 	}
 }
