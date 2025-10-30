@@ -12,7 +12,7 @@ using Mybad.Services.OpenDota.ApiResponseReaders;
 
 namespace Mybad.Services.OpenDota;
 
-public class OpendotaProvider : IInfoProvider
+public class OpendotaProvider
 {
 	private static string _urlPath = "https://api.opendota.com/api/";
 

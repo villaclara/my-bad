@@ -1,6 +1,8 @@
 ﻿namespace Mybad.Core;
 
-public interface IInfoProvider
+public interface IInfoProvider<TRequest, TResponse>
+	where TRequest : BaseRequest
+	where TResponse : BaseResponse
 {
-	Task<BaseResponse> GetData(BaseRequest request);
+	Task<TResponse> GetInfo(TRequest request);
 }
