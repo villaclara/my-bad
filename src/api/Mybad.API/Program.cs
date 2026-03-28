@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Mybad.API.Endpoints;
 using Mybad.API.Services;
@@ -11,13 +12,21 @@ using Mybad.Services.OpenDota.Cachers;
 using Mybad.Storage.DB;
 using Mybad.Storage.DB.Services;
 using Serilog;
-using System.Threading.RateLimiting;
+using Serilog.Events;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 7,
+        fileSizeLimitBytes: 10_000_000,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+        shared: true)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -25,14 +34,15 @@ builder.Host.UseSerilog();
  * API (current project) services registration. 
  */
 builder.Services.AddSingleton<HeroMatchupCacherStatus>();
+builder.Services.AddHostedService<HeroMatchupCacherHostedService>();
 
 builder.Services.AddSingleton<PatchService>();
 
 builder.Services.AddHostedService<PatchGetterHostedService>();
+
 // Register some stuff only in Prod env.
 if (builder.Environment.IsProduction())
 {
-    builder.Services.AddHostedService<HeroMatchupCacherHostedService>();
 
 
     // Configuring Rate Limiting Middleware

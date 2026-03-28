@@ -18,19 +18,22 @@ COPY src/api/Mybad.Core.Services/Mybad.Services.OpenDota/*.csproj src/api/Mybad.
 COPY src/api/Mybad.Storage/*.csproj src/api/Mybad.Storage/
 COPY src/ui/front/Mybad.AngularFront/*.esproj src/ui/front/Mybad.AngularFront/
 
+# Copy Angular package files
+COPY src/ui/front/Mybad.AngularFront/package*.json src/ui/front/Mybad.AngularFront/
+
 # Restore dependencies
 RUN dotnet restore src/api/Mybad.API/Mybad.API.csproj
 
-# Copy full source
-COPY src/ ./src/
-
-# Before dotnet publish remove broken node_modules and install them again
+# Install Angular dependencies (Cached)
+# Using 'npm ci' is for automated builds
 WORKDIR /source/src/ui/front/Mybad.AngularFront
-RUN rm -rf node_modules package-lock.json \
-    && npm install
+RUN npm ci
 
 # Return to workdir
 WORKDIR /source
+
+# Copy full source
+COPY src/ ./src/
 
 # Publish (this runs Angular build internally)
 RUN dotnet publish src/api/Mybad.API/Mybad.API.csproj \
