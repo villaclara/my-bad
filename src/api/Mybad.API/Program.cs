@@ -1,8 +1,8 @@
-using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Mybad.API.Endpoints;
 using Mybad.API.Services;
 using Mybad.Core;
+using Mybad.Core.Admin.Dashboard;
 using Mybad.Core.Providers.CoreHeroMatchupProvider;
 using Mybad.Core.Requests;
 using Mybad.Core.Responses;
@@ -13,6 +13,7 @@ using Mybad.Storage.DB;
 using Mybad.Storage.DB.Services;
 using Serilog;
 using Serilog.Events;
+using System.Threading.RateLimiting;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -188,6 +189,11 @@ app.MapGet("/cacheOnce", async (ODotaHeroMatchupCacher cacher) =>
     return "success";
 })
     .AddEndpointFilter<ApiKeyEndpointFilter>();
+
+app.MapGet("/tables", (IDataManager manager) =>
+{
+    return manager.GetTablesMetadata();
+});
 
 app.MapFallbackToFile("index.html");
 
