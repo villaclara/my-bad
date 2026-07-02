@@ -10,12 +10,18 @@ public class ApplicationDbContext : DbContext
     {
     }
 
+    /* 
+     * IMPORTANT !!!
+     * If adding new DbSet, please add it to SelectDbSet method as well.
+     * As we want to be able to select DbSet by table name in runtime.
+     */
     public DbSet<WardEntity> Wards { get; set; } = default!;
     public DbSet<ParsedMatchWardInfo> ParsedMatchWardInfos { get; set; } = default!;
     public DbSet<HeroMatchupEnemyEntity> HeroMatchupEnemies { get; set; } = default!;
     public DbSet<HeroMatchupAllyEntity> HeroMatchupAllies { get; set; } = default!;
     public DbSet<CheckedMatchMatchupEntity> CheckedMatches { get; set; } = default!;
     public DbSet<HeroMatchesEntity> HeroesMatches { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<WardEntity>(b =>
@@ -58,5 +64,23 @@ public class ApplicationDbContext : DbContext
             cm.ToTable("heroes_matches_counts");
             cm.HasKey(hm => new { hm.HeroId, hm.PatchId });
         });
+    }
+
+    /// <summary>
+    /// Gets a DbSet as non-generic IQueryable based on provided table name.
+    /// </summary>
+    /// <exception cref="ArgumentException"></exception>
+    public IQueryable SelectDbSet(string tableName)
+    {
+        return tableName.ToLowerInvariant() switch
+        {
+            "wards" => Wards,
+            "wards_parsed_matches" => ParsedMatchWardInfos,
+            "matchup_allies" => HeroMatchupAllies,
+            "matchup_enemies" => HeroMatchupEnemies,
+            "matchup_checked_matches" => CheckedMatches,
+            "heroes_matches_counts" => HeroesMatches,
+            _ => throw new ArgumentException($"Table '{tableName}' not found.")
+        };
     }
 }

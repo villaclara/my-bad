@@ -1,0 +1,143 @@
+<div *ngIf="!isKeySet()">
+  <div>Enter secret key</div>
+  <input #keyInput type="password"
+    class="bg-black border border-[#333] text-white rounded px-2 py-1 outline-none focus:border-gray-500" />
+
+  <button type="button" (click)="setKey(keyInput.value)"
+    class="ml-2 bg-[#2e2e2e] hover:bg-[#3e3e3e] text-white py-1 px-3 rounded text-xs transition-colors">
+    Set key
+  </button>
+</div>
+
+<div *ngIf="errorMsg != null" 
+     class="fixed top-14 left-0 right-0 bottom-0 bg-[#1e293b] backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+  
+  <div class="max-w-md bg-[#1c1c1c] p-6 shadow-2xl">
+    <p class="text-gray-400 text-sm font-mono break-words bg-black/40 p-3 rounded border border-[#2e2e2e]">
+      {{ errorMsg }}
+    </p>
+  </div>
+</div>
+
+<div *ngIf="isKeySet()" class="flex h-[calc(100vh-4rem)] text-[#ededed] overflow-hidden">
+  <div class="md:hidden flex items-center justify-between p-4 border-b border-[#2e2e2e] absolute top-0 w-full z-30">
+    <h1 class="text-white font-semibold">Dashboard</h1>
+    <button (click)="isMobileMenuOpen = !isMobileMenuOpen" class="text-gray-300 hover:text-white">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+  </div>
+
+  <aside [class.hidden]="!isMobileMenuOpen"
+    class="md:flex w-64 flex-col border-r border-[#2e2e2e] absolute md:static z-20 pt-16 md:pt-0 shrink-0 bg-[#1e293b]">
+
+    <div class="hidden md:flex p-4 border-b border-[#2e2e2e]">
+      <h1 class="text-white font-semibold">Dashboard</h1>
+    </div>
+
+    <div class="flex-1 overflow-y-auto py-2 custom-scrollbar">
+      <ul>
+        <li *ngFor="let table of tables()" (click)="loadTable(table.name, 1, 100); isMobileMenuOpen = false"
+          class="px-4 py-1.5 cursor-pointer flex items-center justify-between hover:bg-[#334155] group transition-colors font-semibold"
+          [class.bg-[#334155]]="activeTable() === table.name" [class.text-white]="activeTable() === table.name"
+          [class.text-gray-400]="activeTable() !== table.name">
+          <div class="flex items-center gap-2 truncate">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <span class="truncate text-white text-xs">{{ table.name }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 pt-16 md:pt-0">
+
+    <header class="flex items-end border-b border-[#2e2e2e] bg-[#1e293b] h-10 px-2 shrink-0">
+      <div
+        class="px-4 py-2 border-t border-r border-l border-[#2e2e2e] rounded-t-md flex items-center gap-2 text-white text-xs">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+        </svg>
+        {{ activeTable() }}
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-auto custom-scrollbar">
+      <table class="text-left border-collapse whitespace-nowrap">
+        <thead class="sticky top-0 bg-[#1c1c1c] z-10 border-b border-[#ffffff] shadow-sm text-s">
+          <tr>
+            <th *ngFor="let col of columns()"
+              class=" max-w-[200px] px-4 py-2 border-r border-[#2e2e2e] font-normal text-gray-300 bg-[#1e293b] hover:bg-[#334155] cursor-pointer group">
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                  <svg *ngIf="col.isPK" class="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                    </path>
+                  </svg>
+                  <span class="font-semibold">{{ col.name }}</span>
+                  <span class="text-white text-[10px]">{{ col.type }}</span>
+                </div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="text-xs">
+          <tr *ngFor="let row of tableData()"
+            class="hover:bg-[#4c5e78] border-b border-[#2e2e2e] transition-colors group">
+            <td *ngFor="let col of columns()"
+              class=" max-w-[200px] px-4 py-1.5 border-r border-[#2e2e2e] text-[#ededed] truncate max-w-[200px]">
+              <div class="flex items-center justify-between">
+                {{ getPascalValue(row, col.name) }}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      class="h-10 px-4 border-t border-[#2e2e2e] bg-[#1c1c1c] flex items-center justify-between text-xs text-gray-400 shrink-0">
+      <div class="flex items-center gap-2">
+
+        <button (click)="goToPage(pagination().page - 1)" [disabled]="pagination().page <= 1"
+          class="hover:text-white disabled:opacity-40 disabled:hover:text-gray-400 transition-colors">
+          &larr;
+        </button>
+
+        <span>
+          Page
+          <input type="number" [value]="pagination().page" (keydown.enter)="onPageInput($event)"
+            (blur)="onPageInput($event)"
+            class="w-10 bg-black border border-[#333] rounded px-1 py-0.5 text-center text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+          of {{ pagination().totalPages || 1 }}
+        </span>
+
+        <button (click)="goToPage(pagination().page + 1)" [disabled]="pagination().page >= pagination().totalPages"
+          class="hover:text-white disabled:opacity-40 disabled:hover:text-gray-400 transition-colors">
+          &rarr;
+        </button>
+
+        <span class="ml-4 border border-[#333] rounded text-white bg-black overflow-hidden flex items-center">
+          <select [value]="pagination().pageSize" (change)="onPageSizeChange($event)"
+            class="bg-transparent px-2 py-0.5 outline-none text-xs border-none cursor-pointer focus:ring-0 text-white">
+            <option value="10" class="bg-[#1c1c1c]">10 rows</option>
+            <option value="25" class="bg-[#1c1c1c]">25 rows</option>
+            <option value="50" class="bg-[#1c1c1c]">50 rows</option>
+            <option value="100" class="bg-[#1c1c1c]">100 rows</option>
+          </select>
+        </span>
+
+        <span class="ml-2 text-gray-500">
+          Showing {{ tableData().length }} of {{ pagination().totalCount }} records
+        </span>
+      </div>
+    </div>
+  </main>
+</div>

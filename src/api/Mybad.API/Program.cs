@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Mybad.API.Endpoints;
 using Mybad.API.Services;
 using Mybad.Core;
-using Mybad.Core.Admin.Dashboard;
 using Mybad.Core.Providers.CoreHeroMatchupProvider;
 using Mybad.Core.Requests;
 using Mybad.Core.Responses;
@@ -173,6 +172,7 @@ if (!app.Environment.IsDevelopment())
 app.MapWardEndpoints();
 app.MapMatchupEndpoints();
 app.MapPlayerEndpoints();
+app.MapAdminEndpoints();
 
 app.MapTgBotEndpoints(webhookURL);
 
@@ -189,11 +189,6 @@ app.MapGet("/cacheOnce", async (ODotaHeroMatchupCacher cacher) =>
     return "success";
 })
     .AddEndpointFilter<ApiKeyEndpointFilter>();
-
-app.MapGet("/tables", (IDataManager manager) =>
-{
-    return manager.GetTablesMetadata();
-});
 
 app.MapFallbackToFile("index.html");
 

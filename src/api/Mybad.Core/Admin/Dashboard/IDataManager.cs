@@ -2,10 +2,15 @@
 
 public interface IDataManager
 {
-    List<TableMetadata> GetTablesMetadata();   // here pbly return table name + columns. 
-    // But Im not sure because as I see in front i want to have tables list on the left
-    // then when i select one table i got it columns while loading data. so maybe this is good anyway
+    /// <summary>
+    /// Gets the metadata for all tables in the database, including their names and columns.
+    /// </summary>
+    /// <returns>Meta instance for all tables.</returns>
+    List<TableMetadata> GetTablesMetadata();
 
-    List<T> GetTableData<T>();  // here probably goes the Skip + Pagination 
-    // implementation of pagination should be cursor based with continious scrolling on front end and also page based
+    /// <summary>
+    /// Get the data for a specific table, with pagination support.
+    /// </summary>
+    /// <returns>Instance of <see cref="TableApiResponse"/> containing list of data and some meta info.</returns>
+    Task<TableApiResponse> GetTableData(string tableName, int page = 1, int pageSize = 100);
 }

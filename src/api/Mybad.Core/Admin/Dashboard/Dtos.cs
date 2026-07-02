@@ -1,10 +1,23 @@
 ﻿namespace Mybad.Core.Admin.Dashboard;
 
-internal class Dtos
-{
-}
+internal class Dtos { }
 
-public record TableMetadata(string Name, List<string> Columns);
+/// <summary>
+/// Represents a column in a database table with its name, type, and primary key status.
+/// </summary>
+public record TableColumn(string Name, string Type, bool IsPK);
 
-public record TableData<T>(string Name, List<T> Data)
-    where T : class;
+/// <summary>
+/// Represents metadata for a database table, including its name and a list of columns.
+/// </summary>
+public record TableMetadata(string Name, List<TableColumn> Columns);
+
+/// <summary>
+/// Represents a response from a table API, containing the data and pagination metadata.
+/// </summary>
+public record TableApiResponse(List<object> Data, Pagination Meta);
+
+/// <summary>
+/// Represents pagination information for API responses, including the current page, page size, total count of items, and total number of pages.
+/// </summary>
+public record Pagination(int Page, int PageSize, int TotalCount, int TotalPages);

@@ -3,12 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { IndexComponent } from './components/index/index.component';
 import { WardsMainComponent } from './components/wards/wards-main/wards-main.component';
 import { MatchupsComponent } from './components/matchups/matchups.component';
+import { AdminpageComponent } from './components/adminpage/adminpage.component';
 // Here we should probably create the routes for the app - like paths
 // So the app can be navigated like from /home, to /matchup etc
 const routes: Routes = [
   { path: '', component: IndexComponent },
   { path: 'wards', component: WardsMainComponent },
-  { path: 'matchups', component: MatchupsComponent }
+  { path: 'matchups', component: MatchupsComponent },
+  { path: 'admin', component: AdminpageComponent }
 ];
 
 @NgModule({
